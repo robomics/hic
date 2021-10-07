@@ -339,7 +339,7 @@ if(!params.bwt2_index && params.fasta){
         fasta_base = fasta.toString() - ~/(\.fa)?(\.fasta)?(\.fas)?(\.fsa)?$/
         """
         mkdir bowtie2_index
-	bowtie2-build ${fasta} bowtie2_index/${fasta_base}
+	bowtie2-build --threads ${task.cpus} ${fasta} bowtie2_index/${fasta_base}
 	"""
       }
  }
