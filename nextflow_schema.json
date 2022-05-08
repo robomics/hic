@@ -312,7 +312,7 @@
                     "description": "Do not run TADs calling"
                 },
                 "skip_compartments": {
-                    "type": "string",
+                    "type": "boolean",
                     "description": "Do not run compartments calling"
                 },
                 "skip_balancing": {
