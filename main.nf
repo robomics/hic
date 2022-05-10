@@ -634,9 +634,10 @@ if (!params.dnase){
       opts += params.max_restriction_fragment_size > 0 ? " -m ${params.max_restriction_fragment_size}" : ''
       opts += params.save_interaction_bam ? " --sam" : ''
       prefix = pe_bam.toString() - ~/.bam/
+      memory_mb=task.memory.toMega() - 100
       """
       mapped_2hic_fragments.py -f ${frag_file} -r ${pe_bam} --all ${opts}
-      sort -k2,2V -k3,3n -k5,5V -k6,6n -o ${prefix}.validPairs ${prefix}.validPairs
+      sort -S ${memory_mb}M -k2,2V -k3,3n -k5,5V -k6,6n -o ${prefix}.validPairs ${prefix}.validPairs
       """
    }
 }
@@ -663,9 +664,10 @@ else{
 
       opts = params.min_cis_dist > 0 ? " -d ${params.min_cis_dist}" : ''
       prefix = pe_bam.toString() - ~/.bam/
+      memory_mb=task.memory.toMega() - 100
       """
       mapped_2hic_dnase.py -r ${pe_bam} ${opts}
-      sort -k2,2V -k3,3n -k5,5V -k6,6n -o ${prefix}.validPairs ${prefix}.validPairs
+      sort -S ${memory_mb}M -k2,2V -k3,3n -k5,5V -k6,6n -o ${prefix}.validPairs ${prefix}.validPairs
       """
    }
 }
@@ -689,12 +691,13 @@ process remove_duplicates {
    file("*mergestat") into all_mergestat
 
    script:
+   memory_mb=task.memory.toMega() - 100
    if ( ! params.keep_dups ){
    """
    mkdir -p stats/${sample}
 
    ## Sort valid pairs and remove read pairs with same starts (i.e duplicated read pairs)
-   sort -S 50% -k2,2V -k3,3n -k5,5V -k6,6n -m ${vpairs} | \\
+   sort -S ${memory_mb}M -k2,2V -k3,3n -k5,5V -k6,6n -m ${vpairs} | \\
    awk -F"\\t" 'BEGIN{c1=0;c2=0;s1=0;s2=0}(c1!=\$2 || c2!=\$5 || s1!=\$3 || s2!=\$6){print;c1=\$2;c2=\$5;s1=\$3;s2=\$6}' > ${sample}.allValidPairs
 
    echo -n "valid_interaction\t" > ${sample}_allValidPairs.mergestat
